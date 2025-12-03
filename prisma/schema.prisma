@@ -1,0 +1,116 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+}
+
+model Projeto {
+  id          Int             @id @default(autoincrement())
+  nome        String
+  ambiente    Ambiente
+  descricao   String
+  tags        ProjetoTag[]
+  capa        String
+  imagens     ProjetoImagem[]
+  coresUsadas ProjetoCor[]
+  createdAt   DateTime        @default(now())
+}
+
+model ProjetoTag {
+  id        Int     @id @default(autoincrement())
+  tag       String
+  projeto   Projeto @relation(fields: [projetoId], references: [id])
+  projetoId Int
+}
+
+model ProjetoImagem {
+  id        Int     @id @default(autoincrement())
+  url       String
+  projeto   Projeto @relation(fields: [projetoId], references: [id])
+  projetoId Int
+}
+
+model ProjetoCor {
+  id        Int     @id @default(autoincrement())
+  projeto   Projeto @relation(fields: [projetoId], references: [id])
+  projetoId Int
+
+  cor   Cores @relation(fields: [corId], references: [id])
+  corId Int
+}
+
+enum Ambiente {
+  COZINHA
+  DORMITORIO
+  SALA
+  BANHEIRO
+  ESCRITORIO
+  AREA_GOURMET
+}
+
+enum TipoCor {
+  MADEIRA
+  NEUTRO
+  ROCHOSO
+}
+
+model Cores {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  linha     String
+  colecao   String
+  tipo      TipoCor
+  imagem    String
+  createdAt DateTime @default(now())
+
+  projetos ProjetoCor[]
+}
+
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  name      String
+  phone     String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model HomeCarousel {
+  id        Int      @id @default(autoincrement())
+  url       String
+  ordem     Int
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model SiteSettings {
+  id           Int             @id @default(autoincrement())
+  heroTitle    String
+  heroSubtitle String
+  heroImages   HomeHeroImage[]
+  updatedAt    DateTime        @updatedAt
+}
+
+model HomeHeroImage {
+  id         Int          @id @default(autoincrement())
+  url        String
+  ordem      Int
+  ativo      Boolean      @default(true)
+  settings   SiteSettings @relation(fields: [settingsId], references: [id])
+  settingsId Int
+}
