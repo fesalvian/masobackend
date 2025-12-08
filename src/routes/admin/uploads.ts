@@ -5,7 +5,6 @@ import { requireAdmin } from "../../middlewares/requireAdmin";
 
 const router = Router();
 
-// Config Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -21,26 +20,22 @@ router.post("/", requireAdmin, async (req, res) => {
       return res.status(400).json({ error: "Nenhuma imagem enviada." });
     }
 
-    // Se faltar o prefixo, adiciona automaticamente
-    if (!base64.startsWith("data:")) {
+    if (!base64.startsWith("data:"))
       base64 = `data:image/jpeg;base64,${base64}`;
-    }
+
+    // pasta final
+    const finalFolder = `maso-site/${folder ?? "geral"}`;
 
     const upload = await cloudinary.uploader.upload(base64, {
-      folder: folder || "maso-site",
+      folder: finalFolder,
     });
-
-    console.log("TOKEN RECEBIDO:", req.headers.authorization);
-    console.log("BODY RECEBIDO:", Object.keys(req.body));
-
 
     return res.json({ url: upload.secure_url });
 
-  } catch (e: any) {
+  } catch (e) {
     console.error("Erro no upload:", e);
     return res.status(500).json({ error: "Falha ao enviar a imagem." });
   }
 });
-
 
 export default router;

@@ -59,22 +59,20 @@ router.get("/", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/recentes", async (req, res) => {
-  try {
-    const projetos = await prisma.projeto.findMany({
-      take: 6,
-      orderBy: { createdAt: "desc" },
-      include: {
-        imagens: true,
-      },
-    });
+router.get("/recent", async (req, res) => {
+  const projetos = await prisma.projeto.findMany({
+    take: 6,
+    orderBy: { id: "desc" },
+    include: {
+      imagens: true,
+      coresUsadas: { include: { cor: true } },
+      tags: true,
+    },
+  });
 
-    res.json(projetos);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Erro ao buscar projetos recentes" });
-  }
+  res.json(projetos);
 });
+
 
 
 
